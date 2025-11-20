@@ -1,0 +1,578 @@
+{
+  "info": {
+    "name": "Task Management System API",
+    "description": "Complete API documentation for the Task Management System with JWT authentication and role-based access control",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://taluwausjrpopjkazviz.supabase.co",
+      "type": "string"
+    },
+    {
+      "key": "anon_key",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhbHV3YXVzanJwb3Bqa2F6dml6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MTM0ODgsImV4cCI6MjA3OTE4OTQ4OH0.Q6tpgJyGVC_asv_vOTS-sRHOAqCk50peY8UPcMJZ8mI",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Sign Up",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "string"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/v1/signup",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "v1", "signup"]
+            },
+            "description": "Register a new user account. Returns user object and JWT tokens."
+          },
+          "response": []
+        },
+        {
+          "name": "Sign In",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "string"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/v1/token?grant_type=password",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "v1", "token"],
+              "query": [
+                {
+                  "key": "grant_type",
+                  "value": "password"
+                }
+              ]
+            },
+            "description": "Authenticate user and receive JWT access token. Save the access_token from response to use in other requests."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"access_token\", jsonData.access_token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sign Out",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/v1/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "v1", "logout"]
+            },
+            "description": "Sign out the current user and invalidate the JWT token."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/v1/user",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "v1", "user"]
+            },
+            "description": "Get the currently authenticated user's profile information."
+          },
+          "response": []
+        }
+      ],
+      "description": "User authentication endpoints including signup, signin, and token management."
+    },
+    {
+      "name": "Tasks (User)",
+      "item": [
+        {
+          "name": "Get My Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/rest/v1/tasks?select=*&order=created_at.desc",
+              "host": ["{{base_url}}"],
+              "path": ["rest", "v1", "tasks"],
+              "query": [
+                {
+                  "key": "select",
+                  "value": "*"
+                },
+                {
+                  "key": "order",
+                  "value": "created_at.desc"
+                }
+              ]
+            },
+            "description": "Get all tasks for the authenticated user. RLS ensures users only see their own tasks."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Task by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/rest/v1/tasks?id=eq.{{task_id}}&select=*",
+              "host": ["{{base_url}}"],
+              "path": ["rest", "v1", "tasks"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "eq.{{task_id}}"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            },
+            "description": "Get a specific task by ID. Users can only access their own tasks."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "string"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation",
+                "type": "string"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Complete project documentation\",\n  \"description\": \"Write comprehensive README and API docs\",\n  \"status\": \"pending\",\n  \"priority\": \"high\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/rest/v1/tasks",
+              "host": ["{{base_url}}"],
+              "path": ["rest", "v1", "tasks"]
+            },
+            "description": "Create a new task. The user_id is automatically set from the JWT token."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "string"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation",
+                "type": "string"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\",\n  \"description\": \"Updated task description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/rest/v1/tasks?id=eq.{{task_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rest", "v1", "tasks"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "eq.{{task_id}}"
+                }
+              ]
+            },
+            "description": "Update an existing task. Users can only update their own tasks."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/rest/v1/tasks?id=eq.{{task_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rest", "v1", "tasks"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "eq.{{task_id}}"
+                }
+              ]
+            },
+            "description": "Delete a task. Users can only delete their own tasks."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter Tasks by Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/rest/v1/tasks?status=eq.pending&select=*",
+              "host": ["{{base_url}}"],
+              "path": ["rest", "v1", "tasks"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "eq.pending"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            },
+            "description": "Filter tasks by status (pending, in_progress, completed)."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter Tasks by Priority",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/rest/v1/tasks?priority=eq.high&select=*",
+              "host": ["{{base_url}}"],
+              "path": ["rest", "v1", "tasks"],
+              "query": [
+                {
+                  "key": "priority",
+                  "value": "eq.high"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            },
+            "description": "Filter tasks by priority (low, medium, high)."
+          },
+          "response": []
+        }
+      ],
+      "description": "Task CRUD operations for regular users. All operations are protected by RLS policies."
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/rest/v1/tasks?select=*&order=created_at.desc",
+              "host": ["{{base_url}}"],
+              "path": ["rest", "v1", "tasks"],
+              "query": [
+                {
+                  "key": "select",
+                  "value": "*"
+                },
+                {
+                  "key": "order",
+                  "value": "created_at.desc"
+                }
+              ]
+            },
+            "description": "Admins can view all tasks from all users."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Any Task",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "string"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation",
+                "type": "string"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\",\n  \"priority\": \"low\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/rest/v1/tasks?id=eq.{{task_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rest", "v1", "tasks"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "eq.{{task_id}}"
+                }
+              ]
+            },
+            "description": "Admins can update any task regardless of ownership."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Any Task",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/rest/v1/tasks?id=eq.{{task_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rest", "v1", "tasks"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "eq.{{task_id}}"
+                }
+              ]
+            },
+            "description": "Admins can delete any task regardless of ownership."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon_key}}",
+                "type": "string"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "string"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/rest/v1/user_roles?select=*",
+              "host": ["{{base_url}}"],
+              "path": ["rest", "v1", "user_roles"],
+              "query": [
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            },
+            "description": "Admins can view all user roles in the system."
+          },
+          "response": []
+        }
+      ],
+      "description": "Admin-only endpoints with elevated privileges to manage all resources."
+    }
+  ]
+}
